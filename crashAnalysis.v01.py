@@ -83,7 +83,7 @@ print(endTime-startTime)
 
 #Get DSM
 startTime=time.time()
-crashDSM=bd.DSM(crashCoCo,50)
+crashDSM=bd.DSM(crashCoCo,100)
 endTime=time.time()
 print(endTime-startTime)
 
