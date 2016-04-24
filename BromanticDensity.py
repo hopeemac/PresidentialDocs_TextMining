@@ -24,7 +24,7 @@ import math
 tokenizer = nltk.tokenize.treebank.TreebankWordTokenizer()
 stemmer = nltk.stem.snowball.EnglishStemmer()
 punctuation = set(string.punctuation)
-stopWords = nltk.corpus.stopwords.words('english')
+#stopWords = nltk.corpus.stopwords.words('english')
 
 #Define tokenize function
 def tokenize(fileList):
