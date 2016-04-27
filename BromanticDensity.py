@@ -126,7 +126,7 @@ def DSM(coCoDict,k):
     return(svdDict)
 
 #Define function to create context vectors
-def contextVectors(tokens,dsm,k):
+def contextVectors(tokens,dsm,wordList,k):
     
     #Define coOccurence dict
     cvDict={}
@@ -141,24 +141,26 @@ def contextVectors(tokens,dsm,k):
             cvList=tokens[fileName][lowerBound:i]+tokens[fileName][i+1:upperBound+1]
             window=tokens[fileName][i]
             
-            #Add entry for cvDict if window not yet present
-            if window not in cvDict[fileName].keys():
-                cvDict[fileName][window]={}
-            
-            #Create context vector            
-            contextVector={}
-            
-            for word in cvList:
-                for key in dsm[word].keys():                    
-                    #Update context vector
-                    try:
-                        contextVector[key]=contextVector[key]+dsm[word][key]
-                    except:
-                        contextVector[key]=dsm[word][key]
-            
-            #Add context vector to cvDict
-            cvIndex=len(cvDict[fileName][window])+1
-            cvDict[fileName][window][cvIndex]=contextVector
+            #Check if window in wordlistt
+            if window in wordList:            
+                #Add entry for cvDict if window not yet present
+                if window not in cvDict[fileName].keys():
+                    cvDict[fileName][window]={}
+                
+                #Create context vector            
+                contextVector={}
+                
+                for word in cvList:
+                    for key in dsm[word].keys():                    
+                        #Update context vector
+                        try:
+                            contextVector[key]=contextVector[key]+dsm[word][key]
+                        except:
+                            contextVector[key]=dsm[word][key]
+                
+                #Add context vector to cvDict
+                cvIndex=len(cvDict[fileName][window])+1
+                cvDict[fileName][window][cvIndex]=contextVector
     
     #Return context vector dictionary
     return(cvDict)
