@@ -57,9 +57,6 @@ def tokenize(fileList):
             #Convert all text to lower case
             textList=[word.lower() for word in textList]
             
-            #Map Qaida to Qaeda
-            textList=['qaeda' if word == 'qaida' else word for word in textList]
-            
             #Remove punctuation
             textList=[word for word in textList if word not in punctuation]
             textList=["".join(c for c in word if c not in punctuation) for word in textList ]
@@ -237,71 +234,6 @@ def retainRelevantDocs(tokensDict, targetWordList):
         if targetWordFlag == 1:
             newTokens[key] = tokensDict[key]
     return newTokens
-
-
-#Create context vector similarity simulation
-def knnContextVector(cvDict,fileList,contextList,windowList,sim,k):
-    
-    #Define search dict for average context vectors
-    searchDict={}
-    
-    #Ensure contextList contains all windows (also good to ensure windows are matching correcting)
-    contextList=list(set(contextList+windowList))
-    
-    #Loop through each word contextList
-    for word in contextList:
-        
-        #Loop through each file and perform consolidation
-        for fileName in fileList:
-            
-            #Check if word present for this filename
-            if word in cvDict[fileName].keys():
-                
-                #if present loop through each context vecors for word in filename
-                for i in cvDict[fileName][word].keys():
-                    #Add each context vector for word
-                    try:
-                        searchDict[word]={key:searchDict[word][key]+cvDict[fileName][word][i][key] for key in searchDict[word].keys()}
-                    except:
-                        searchDict[word]=cvDict[fileName][word][i]
-        
-        #If word was added update len to unit vector
-        if word in searchDict.keys():                
-            #After creating total context vector for word, normalize to unit vector
-            vectorFraction=(1/np.sum([value for value in searchDict[word].values()]))
-            
-            #Update each value
-            searchDict[word].update((k,v*vectorFraction) for k,v in searchDict[word].items())
-        
-        
-    #Since search space if small find k+1 closest neighbors by cosine similarity
-    #+1 is used because each window is present in search space as backcheck
-    
-    #Define size upfront as empty list
-    outputList=[]
-    
-    #Loop through each window word
-    for i in range(len(windowList)):
-        window=windowList[i]
-        
-        if window in searchDict.keys():
-        
-            #Loop through each context in list
-            #Get cosine similarity and add to simList
-            simList=[[window,context,get_cosine(searchDict[window],searchDict[context])] for context in contextList if context in searchDict.keys()]           
-                
-            #Sort by max cosine simliary in place
-            simList.sort(key=lambda x: x[2], reverse=True)
-            
-            #Add k+1 values to ouputlist
-            outputList.append(simList[:k+1])
-     
-    #Fix format in output list
-    outputList=[x for y in outputList for x in y if y !=None]     
-     
-    #Return output list
-    return(outputList)
-
 
 ##################################
 ######Testing function on WBC#####
