@@ -151,11 +151,11 @@ def contextVectors(tokens,dsm,wordList,k):
         for i in range(len(tokens[fileName])):
             #Adjust window to contain words k in front or k behind
             lowerBound=max(0,i-k)
-            upperBound=min(len(tokens),i+k)
+            upperBound=min(len(tokens[fileName]),i+k) # FIXED BUG HERE, SAME AS ABOVE ADD [FILENAME]
             cvList=tokens[fileName][lowerBound:i]+tokens[fileName][i+1:upperBound+1]
             window=tokens[fileName][i]
             
-            #Check if window in wordlistt
+            #Check if window in wordlist
             if window in wordList:            
                 #Add entry for cvDict if window not yet present
                 if window not in cvDict[fileName].keys():

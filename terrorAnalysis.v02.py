@@ -77,8 +77,8 @@ preAttackFiles=metaFileDF[metaFileDF['datetime'].isin(preAttackDateList)].filePa
 postAttackDateList=datelist(date(2001,9,11),date(2003,9,11))
 postAttackFiles=metaFileDF[metaFileDF['datetime'].isin(postAttackDateList)].filePath
 
-print(len(preAttackFiles))
-print(len(postAttackFiles))
+print('pre',len(preAttackFiles))
+print('post',len(postAttackFiles))
 sys.stdout.flush()
 allFiles=list(preAttackFiles)+list(postAttackFiles)
 
@@ -95,12 +95,18 @@ sys.stdout.flush()
 
 preAttackFiles = [doc for doc in preAttackFiles if doc in attackTokens.keys()]
 postAttackFiles = [doc for doc in postAttackFiles if doc in attackTokens.keys()]
-            
+print('pre',len(preAttackFiles))
+print('post',len(postAttackFiles))
+print('all',len(allFiles))
+print('alltokens',len(attackTokens.keys()))
+
 #Get word coCo
 print('starting word coco')
 sys.stdout.flush()
 attackCoCo, TF = bd.coOccurence(attackTokens,6)
 print('finished word coco!')
+print('length of coco dict',len(attackCoCo.keys()))
+
 sys.stdout.flush()
 
 #Get DSM
@@ -111,6 +117,8 @@ attackDSM=bd.DSM(attackCoCo,50)
 endTime=time.time()
 print('finished DSM!')
 print((endTime-startTime)/3600)
+print('dsm shape',len(attackDSM.keys()))
+print('dsm dim',attackDSM[list(attackDSM.keys())[0]])
 sys.stdout.flush()
 
 #Remove coCo
@@ -125,6 +133,7 @@ attackCVDict=bd.contextVectors(attackTokens, attackDSM, attackWordList, 6)
 print('finished context vectors!')
 endTime=time.time()
 print((endTime-startTime)/3600)
+print('context vectors dict len',len(attackCVDict.keys()))
 sys.stdout.flush()
 
 #Remove tokens and DSM
