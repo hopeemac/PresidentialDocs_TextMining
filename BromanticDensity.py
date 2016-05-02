@@ -57,6 +57,9 @@ def tokenize(fileList):
             #Convert all text to lower case
             textList=[word.lower() for word in textList]
             
+            #Map Qaida to Qaeda
+            textList=['qaeda' if word == 'qaida' else word for word in textList]
+            
             #Remove punctuation
             textList=[word for word in textList if word not in punctuation]
             textList=["".join(c for c in word if c not in punctuation) for word in textList ]
