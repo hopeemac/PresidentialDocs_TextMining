@@ -106,7 +106,6 @@ sys.stdout.flush()
 attackCoCo, TF, docTF = bd.coOccurence(attackTokens,6)
 print('finished word coco!')
 print('length of coco dict',len(attackCoCo.keys()))
-
 sys.stdout.flush()
 
 #Get DSM
@@ -181,67 +180,29 @@ postAttackTF_DF.to_csv('./postAttack_TF.csv')
 tfList=[[k,v] for k,v in TF.items()]
 tfList.sort(key=lambda x:x[1], reverse = True)
 tfList=[x(0) for x in tfList]
-contextList=list(set(tfList[50:250]+wordList))
+contextList=list(set(tfList[50:250]+attackWordList))
 
 #Get knn for context vectors in pre attack files
-print('starting get knn 1')
+print('starting get knn preAttack')
 sys.stdout.flush()
 startTime=time.time()
-gun1KNN=bd.knnContextVector(CVDict,gun1Files,contextList,wordList,1000,5)
+preAttackKNN=bd.knnContextVector(attackCVDict,preAttackFiles,contextList,attackWordList,1000,5)
 endTime=time.time()
-print('finished knn 1')
+print('finished knn preAttack')
 print((endTime-startTime)/3600)
 sys.stdout.flush()
-gun1KNN=[yList for xList in gun1KNN for yList in xList if xList!=None]
-pd.DataFrame(gun1KNN).to_csv('./gun1_knn.csv', index=False, header=False)
+preAttackKNN=[yList for xList in preAttackKNN for yList in xList if xList!=None]
+pd.DataFrame(preAttackKNN).to_csv('./preAttack_knn.csv', index=False, header=False)
 
 #Get knn for context vectors in pre attack files
-print('starting get knn 1')
+print('starting get knn postAttack')
 sys.stdout.flush()
 startTime=time.time()
-gun1KNN=bd.knnContextVector(CVDict,gun1Files,contextList,wordList,1000,5)
-gun1KNN=[yList for xList in gun1KNN for yList in xList if xList!=None]
-pd.DataFrame(gun1KNN).to_csv('./gun1_knn.csv', index=False, header=False)
-print('finished knn 1')
+postAttackKNN=bd.knnContextVector(attackCVDict,postAttackFiles,contextList,attackWordList,1000,5)
 endTime=time.time()
+print('finished knn postAttack')
 print((endTime-startTime)/3600)
 sys.stdout.flush()
-
-#Get knn for context vectors in pre attack files
-print('starting get knn 2')
-sys.stdout.flush()
-startTime=time.time()
-gun1KNN=bd.knnContextVector(CVDict,gun2Files,contextList,wordList,1000,5)
-gun2KNN=[yList for xList in gun1KNN for yList in xList if xList!=None]
-pd.DataFrame(gun2KNN).to_csv('./gun2_knn.csv', index=False, header=False)
-endTime=time.time()
-print('finished knn 2')
-print((endTime-startTime)/3600)
-sys.stdout.flush()
-
-#Get knn for context vectors in pre attack files
-print('starting get knn 1')
-sys.stdout.flush()
-startTime=time.time()
-gun1KNN=bd.knnContextVector(CVDict,gun1Files,contextList,wordList,1000,5)
-endTime=time.time()
-print('finished knn 1')
-print((endTime-startTime)/3600)
-sys.stdout.flush()
-gun1KNN=[yList for xList in gun1KNN for yList in xList if xList!=None]
-pd.DataFrame(gun1KNN).to_csv('./gun1_knn.csv', index=False, header=False)
-
-#Get knn for context vectors in pre attack files
-print('starting get knn 1')
-sys.stdout.flush()
-startTime=time.time()
-gun1KNN=bd.knnContextVector(CVDict,gun1Files,contextList,wordList,1000,5)
-endTime=time.time()
-print('finished knn 1')
-print((endTime-startTime)/3600)
-sys.stdout.flush()
-gun1KNN=[yList for xList in gun1KNN for yList in xList if xList!=None]
-pd.DataFrame(gun1KNN).to_csv('./gun1_knn.csv', index=False, header=False)
-
-
+postAttackKNN=[yList for xList in postAttackKNN for yList in xList if xList!=None]
+pd.DataFrame(postAttackKNN).to_csv('./postAttack_knn.csv', index=False, header=False)
 
