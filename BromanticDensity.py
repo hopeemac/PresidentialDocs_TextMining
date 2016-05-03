@@ -89,7 +89,8 @@ def coOccurence(tokens,k):
     #Define coOccurence dict
     coCoDict={}
     TF={}
-    
+    docTF={}
+        
     #Loop through each file
     for fileName in tokens.keys():
         for i in range(len(tokens[fileName])):
@@ -107,17 +108,27 @@ def coOccurence(tokens,k):
             for word in coCoList:
                 try:
                     coCoDict[window][word]+=1
-                except:
+                except KeyError:
                     coCoDict[window][word]=1
                     
-            # Make TF Diction
+            # Make TF Dictionary
             try:
                 TF[window]+=1
             except KeyError:
                 TF[window]=1
+                
+            # Get TF Counts by File
+            if fileName in docTF.keys():
+                if window in docTF[fileName].keys():
+                    docTF[fileName][window]+=1
+                else:
+                    docTF[fileName][window]=1
+            else:
+                docTF[fileName]={}
+                docTF[fileName][window]=1
     
     #Return CoCoDict
-    return(coCoDict, TF)
+    return(coCoDict, TF, docTF)
     
 #Define function to perform SVD on co-occurences
 def DSM(coCoDict,k):
@@ -302,6 +313,17 @@ def knnContextVector(cvDict,fileList,contextList,windowList,sim,k):
     #Return output list
     return(outputList)
 
+#Get TF for each period
+def getPeriodTF(docTF, periodFiles):
+    periodTF = {}
+    for file in docTF.keys():
+        if file in periodFiles:
+            for word in docTF[file].keys():
+                try:    
+                    periodTF[word]=periodTF[word]+docTF[file][word]
+                except KeyError:
+                    periodTF[word]=docTF[file][word]
+    return periodTF
 
 ##################################
 ######Testing function on WBC#####

@@ -164,3 +164,34 @@ print((endTime-startTime)/3600)
 sys.stdout.flush()
 pd.DataFrame(postAttackCosine).to_csv('./postAttack_cosine.csv')
 
+#Get TF for each period
+preAttackTF=bd.getPeriodTF(docTF,preAttackFiles)
+pd.DataFrame.from_dict(preAttackTF, orient = 'index').to_csv('./preAttack_TF.csv')
+
+postAttackTF=bd.getPeriodTF(docTF,postAttackFiles)
+pd.DataFrame.from_dict(postAttackTF, orient = 'index').to_csv('./postAttack_TF.csv')
+
+#Get knn for context vectors in pre attack files
+print('starting get knn 1')
+sys.stdout.flush()
+startTime=time.time()
+preAttackKNN=bd.knnContextVector(attackCVDict,preAttackFiles,attackContextList,attackWordList,1000,5)
+endTime=time.time()
+print('finished knn 1')
+print((endTime-startTime)/3600)
+sys.stdout.flush()
+preAttackKNN=[yList for xList in preAttackKNN for yList in xList if xList!=None]
+pd.DataFrame(preAttackKNN).to_csv('./preAttack_knn.csv', index=False, header=False)
+
+#Get knn for context vectors in post attack files
+print('starting get knn 2')
+sys.stdout.flush()
+startTime=time.time()
+postAttackKNN=bd.knnContextVector(attackCVDict,postAttackFiles,attackContextList,attackWordList,1000,5)
+endTime=time.time()
+print('finished knn 2')
+print((endTime-startTime)/3600)
+sys.stdout.flush()
+postAttackKNN=[yList for xList in postAttackKNN for yList in xList if xList!=None]
+pd.DataFrame(postAttackKNN).to_csv('./postAttack_knn.csv')
+
