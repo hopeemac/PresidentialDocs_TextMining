@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Apr 19 14:08:57 2016
+runSample = False
 
-@author: nmvenuti
-"""
 import gc, sys
 import os, glob, time
 import os.path
@@ -82,6 +78,9 @@ print('post',len(postAttackFiles))
 sys.stdout.flush()
 allFiles=list(preAttackFiles)+list(postAttackFiles)
 
+if runSample == True:
+    import random
+    allFiles = random.sample(allFiles, 200)
 
 print('starting tokenization')
 sys.stdout.flush()
@@ -167,19 +166,19 @@ pd.DataFrame(postAttackCosine).to_csv('./postAttack_cosine.csv')
 preAttackTF=bd.getPeriodTF(docTF,preAttackFiles)
 preAttackTF_DF = pd.DataFrame.from_dict(preAttackTF, orient = 'index')
 preAttackTF_DF.columns = ['TF']
-preAttackTF_DF = preAttackTF_DF.sort_values(by='TF',ascending=False)
+preAttackTF_DF = preAttackTF_DF.sort('TF',ascending=False)
 preAttackTF_DF.to_csv('./preAttack_TF.csv')
 
 postAttackTF=bd.getPeriodTF(docTF,postAttackFiles)
 postAttackTF_DF = pd.DataFrame.from_dict(postAttackTF, orient = 'index')
 postAttackTF_DF.columns = ['TF']
-postAttackTF_DF = postAttackTF_DF.sort_values(by='TF',ascending=False)
+postAttackTF_DF = postAttackTF_DF.sort('TF',ascending=False)
 postAttackTF_DF.to_csv('./postAttack_TF.csv')
 
 #Get ContextList for KNN
 tfList=[[k,v] for k,v in TF.items()]
 tfList.sort(key=lambda x:x[1], reverse = True)
-tfList=[x(0) for x in tfList]
+tfList=[x[0] for x in tfList]
 contextList=list(set(tfList[50:250]+attackWordList))
 
 #Get knn for context vectors in pre attack files
