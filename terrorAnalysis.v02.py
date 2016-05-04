@@ -1,9 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Apr 19 14:08:57 2016
+runSample = False
 
-@author: nmvenuti
-"""
 import gc, sys
 import os, glob, time
 import os.path
@@ -71,6 +67,9 @@ print('post',len(postAttackFiles))
 sys.stdout.flush()
 allFiles=list(preAttackFiles)+list(postAttackFiles)
 
+if runSample == True:
+    import random
+    allFiles = random.sample(allFiles, 200)
 
 print('starting tokenization')
 sys.stdout.flush()
@@ -180,6 +179,7 @@ endTime=time.time()
 print('finished knn preAttack')
 print((endTime-startTime)/3600)
 sys.stdout.flush()
+
 pd.DataFrame(preAttackKNN).to_csv('./preAttack_knn.csv', index=False, header=False)
 
 #Get knn for context vectors in pre attack files
@@ -191,4 +191,6 @@ endTime=time.time()
 print('finished knn postAttack')
 print((endTime-startTime)/3600)
 sys.stdout.flush()
+
 pd.DataFrame(postAttackKNN).to_csv('./postAttack_knn.csv', index=False, header=False)
+

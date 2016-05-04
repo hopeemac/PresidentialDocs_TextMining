@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 runSample = False
 
 import gc, sys
