@@ -12,7 +12,7 @@ sys.path.append('.')
 import BromanticDensity as bd
 stemmer = nltk.stem.snowball.EnglishStemmer()
 
-sys.stdout = open("crashlog.txt", "a")
+sys.stdout = open("gunlog.txt", "a")
 print(str(datetime.now()))
 print('Finished importing modules')
 sys.stdout.flush()
@@ -46,27 +46,24 @@ metaFileDF=pd.read_csv('./CPD/shortMeta.csv')
 metaFileDF['datetime']=pd.to_datetime(metaFileDF['date'])
 metaFileDF['filePath']=rawPath+'/'+ metaFileDF['year'].map(str)+'/'+metaFileDF['fileName']+'.txt'
 
-#########################            
-##### Crash analysis#####
-#########################
+######################            
+#####Gun analysis#####
+######################
 
 #Bring in attack wordlist
-wordList=['business','loan','economy','bank','bailout','stability',
-               'stimulus','tax','billion','mortgage','recovery','stock',
-               'street','unemployment','jobs','foreclosure','treasury',
-               'regulation','greed','recession', 'credit']
+wordList=['gun','gunman','shoot','tragedy','background','mental','hate',
+'safety','god','death','kill','hatred','control','congress','amendment','right']
 
 wordList=[stemmer.stem(word) for word in wordList]
 
-#Datelist for pre and post crash
-preCrashDateList=datelist(date(2005,1,1),date(2006,12,31))
-preCrashFiles=metaFileDF[metaFileDF['datetime'].isin(preCrashDateList)].filePath
-crashDateList=datelist(date(2007,1,1),date(2008,12,31))
-crashFiles=metaFileDF[metaFileDF['datetime'].isin(crashDateList)].filePath
-postCrashDateList=datelist(date(2007,1,1),date(2008,12,31))
-postCrashFiles=metaFileDF[metaFileDF['datetime'].isin(postCrashDateList)].filePath
+#Datelist for gun events
+preSandyDateList=datelist(date(2012,9,14),date(2012,12,13))
+preSandyFiles=metaFileDF[metaFileDF['datetime'].isin(preSandyDateList)].filePath
+postSandyDateList=datelist(date(2012,12,14),date(2013,3,14))
+postSandyFiles=metaFileDF[metaFileDF['datetime'].isin(postSandyDateList)].filePath
 
-allFiles=list(preCrashFiles)+list(crashFiles)+list(postCrashFiles)
+
+allFiles=list(preSandyFiles)+list(postSandyFiles)
 
 if runSample == True:
     import random
@@ -82,9 +79,8 @@ sys.stdout.flush()
 #Subset tokens only for attack dates
 #attackTokens={key:value for key, value in rawTokens.items() if key in allFiles}
 
-preCrashFiles = [doc for doc in preCrashFiles if doc in tokens.keys()]
-crashFiles = [doc for doc in crashFiles if doc in tokens.keys()]
-postCrashFiles = [doc for doc in postCrashFiles if doc in tokens.keys()]
+preSandyFiles = [doc for doc in preSandyFiles if doc in tokens.keys()]
+postSandyFiles = [doc for doc in postSandyFiles if doc in tokens.keys()]
 
 
 #Get word coCo
@@ -131,45 +127,31 @@ gc.collect()
 #Run cosine sim for pre attack files
 print('starting get sem density 1')
 sys.stdout.flush()
-preCrashCosine=bd.averageCosine(CVDict,preCrashFiles,wordList,1000)
-pd.DataFrame(preCrashCosine).to_csv('./preCrash_cosine.csv')
+preSandyCosine=bd.averageCosine(CVDict,preSandyFiles,wordList,1000)
+pd.DataFrame(preSandyCosine).to_csv('./preSandy_cosine.csv')
 print('finished sem density 1')
 sys.stdout.flush()
 
 print('starting get sem density 2')
 sys.stdout.flush()
-crashCosine=bd.averageCosine(CVDict,crashFiles,wordList,1000)
-pd.DataFrame(crashCosine).to_csv('./crash_cosine.csv')
+postSandyCosine=bd.averageCosine(CVDict,postSandyFiles,wordList,1000)
+pd.DataFrame(postSandyCosine).to_csv('./postSandy_cosine.csv')
 print('finished sem density 2')
 sys.stdout.flush()
 
-print('starting get sem density 3')
-sys.stdout.flush()
-postCrashCosine=bd.averageCosine(CVDict,postCrashFiles,wordList,1000)
-pd.DataFrame(postCrashCosine).to_csv('./postCrash_cosine.csv')
-print('finished sem density 3')
-sys.stdout.flush()
+#Get TF for each period
+preSandyTF=bd.getPeriodTF(docTF,preSandyFiles)
+preSandyTF_DF = pd.DataFrame.from_dict(preSandyTF, orient = 'index')
+preSandyTF_DF.columns = ['TF']
+preSandyTF_DF = preSandyTF_DF.sort('TF',ascending=False)
+preSandyTF_DF.to_csv('./preSandy_TF.csv', encoding='utf-8')
 
 #Get TF for each period
-preCrashTF=bd.getPeriodTF(docTF,preCrashFiles)
-preCrashTF_DF = pd.DataFrame.from_dict(preCrashTF, orient = 'index')
-preCrashTF_DF.columns = ['TF']
-preCrashTF_DF = preCrashTF_DF.sort('TF',ascending=False)
-preCrashTF_DF.to_csv('./preCrash_TF.csv')
-
-#Get TF for each period
-crashTF=bd.getPeriodTF(docTF,crashFiles)
-crashTF_DF = pd.DataFrame.from_dict(crashTF, orient = 'index')
-crashTF_DF.columns = ['TF']
-crashTF_DF = crashTF_DF.sort('TF',ascending=False)
-crashTF_DF.to_csv('./crash_TF.csv')
-
-#Get TF for each period
-postCrashTF=bd.getPeriodTF(docTF,postCrashFiles)
-postCrashTF_DF = pd.DataFrame.from_dict(postCrashTF, orient = 'index')
-postCrashTF_DF.columns = ['TF']
-postCrashTF_DF = postCrashTF_DF.sort('TF',ascending=False)
-postCrashTF_DF.to_csv('./postCrash_TF.csv')
+postSandyTF=bd.getPeriodTF(docTF,postSandyFiles)
+postSandyTF_DF = pd.DataFrame.from_dict(postSandyTF, orient = 'index')
+postSandyTF_DF.columns = ['TF']
+postSandyTF_DF = postSandyTF_DF.sort('TF',ascending=False)
+postSandyTF_DF.to_csv('./postSandy_TF.csv', encoding='utf-8')
 
 #Get ContextList for KNN
 tfList=[[k,v] for k,v in TF.items()]
@@ -178,32 +160,22 @@ tfList=[x[0] for x in tfList]
 contextList=list(set(tfList[50:250]+wordList))
 
 #Get knn for context vectors in pre attack files
-print('starting get knn preCrash')
+print('starting get knn preSandy')
 sys.stdout.flush()
 startTime=time.time()
-preCrashKNN=bd.knnContextVector(CVDict,preCrashFiles,contextList,wordList,1000,5)
+preSandyKNN=bd.knnContextVector(CVDict,preSandyFiles,contextList,wordList,1000,5)
 endTime=time.time()
-print('finished knn preCrash')
+print('finished knn preSandy')
 print((endTime-startTime)/3600)
 sys.stdout.flush()
-pd.DataFrame(preCrashKNN).to_csv('./preCrash_knn.csv', index=False, header=False)
+pd.DataFrame(preSandyKNN).to_csv('./preSandy_knn.csv', index=False, header=False)
 
-print('starting get knn crash')
+print('starting get knn postSandy')
 sys.stdout.flush()
 startTime=time.time()
-crashKNN=bd.knnContextVector(CVDict,crashFiles,contextList,wordList,1000,5)
+postSandyKNN=bd.knnContextVector(CVDict,postSandyFiles,contextList,wordList,1000,5)
 endTime=time.time()
-print('finished knn crash')
+print('finished knn postSandy')
 print((endTime-startTime)/3600)
 sys.stdout.flush()
-pd.DataFrame(crashKNN).to_csv('./crash_knn.csv', index=False, header=False)
-
-print('starting get knn postCrash')
-sys.stdout.flush()
-startTime=time.time()
-postCrashKNN=bd.knnContextVector(CVDict,postCrashFiles,contextList,wordList,1000,5)
-endTime=time.time()
-print('finished knn postCrash')
-print((endTime-startTime)/3600)
-sys.stdout.flush()
-pd.DataFrame(postCrashKNN).to_csv('./postCrash_knn.csv', index=False, header=False)
+pd.DataFrame(postSandyKNN).to_csv('./postSandy_knn.csv', index=False, header=False)

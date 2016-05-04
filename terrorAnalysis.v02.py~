@@ -44,15 +44,26 @@ for dirpath, dirnames, filenames in os.walk(rawPath):
 #Get tokens
 #rawTokens=bd.tokenize(rawFileList)
 
-#Get short meta csv
-metaFileDF=pd.read_csv('./CPD/shortMeta.csv')
+#Get filelist for date metadata
+metaFilePath='./CPD/metadata'
+metaFileList = listdir(metaFilePath)
+metaFileList=[metaFilePath+'/'+fileName for fileName in metaFileList if 'all' in fileName]
+
+
+#Create pandas dataframe with all metadata files
+for fileName in metaFileList:
+    df = pd.read_csv(fileName)
+    try:
+        metaFileDF=metaFileDF.append(df, ignore_index=True)
+    except:
+        metaFileDF=df
 
 metaFileDF['datetime']=pd.to_datetime(metaFileDF['date'])
 metaFileDF['filePath']=rawPath+'/'+ metaFileDF['year'].map(str)+'/'+metaFileDF['fileName']+'.txt'
 
-################################            
+#################################            
 #####Pre-Post 9/11 analysis#####
-################################
+#################################
 
 #Bring in attack wordlist
 attackWordList=['terrorism','laden','qaeda','wmd','attack','homeland',
@@ -92,9 +103,10 @@ print('alltokens',len(attackTokens.keys()))
 #Get word coCo
 print('starting word coco')
 sys.stdout.flush()
-attackCoCo, TF, docTF = bd.coOccurence(attackTokens,6)
+attackCoCo, TF = bd.coOccurence(attackTokens,6)
 print('finished word coco!')
 print('length of coco dict',len(attackCoCo.keys()))
+
 sys.stdout.flush()
 
 #Get DSM
@@ -106,7 +118,7 @@ endTime=time.time()
 print('finished DSM!')
 print((endTime-startTime)/3600)
 print('dsm shape',len(attackDSM.keys()))
-#print('dsm dim',attackDSM[list(attackDSM.keys())[0]])
+print('dsm dim',attackDSM[list(attackDSM.keys())[0]])
 sys.stdout.flush()
 
 #Remove coCo
@@ -152,43 +164,3 @@ print((endTime-startTime)/3600)
 sys.stdout.flush()
 pd.DataFrame(postAttackCosine).to_csv('./postAttack_cosine.csv')
 
-#Get TF for each period
-preAttackTF=bd.getPeriodTF(docTF,preAttackFiles)
-preAttackTF_DF = pd.DataFrame.from_dict(preAttackTF, orient = 'index')
-preAttackTF_DF.columns = ['TF']
-preAttackTF_DF = preAttackTF_DF.sort('TF',ascending=False)
-preAttackTF_DF.to_csv('./preAttack_TF.csv')
-
-postAttackTF=bd.getPeriodTF(docTF,postAttackFiles)
-postAttackTF_DF = pd.DataFrame.from_dict(postAttackTF, orient = 'index')
-postAttackTF_DF.columns = ['TF']
-postAttackTF_DF = postAttackTF_DF.sort('TF',ascending=False)
-postAttackTF_DF.to_csv('./postAttack_TF.csv')
-
-#Get ContextList for KNN
-tfList=[[k,v] for k,v in TF.items()]
-tfList.sort(key=lambda x:x[1], reverse = True)
-tfList=[x[0] for x in tfList]
-contextList=list(set(tfList[50:250]+attackWordList))
-
-#Get knn for context vectors in pre attack files
-print('starting get knn preAttack')
-sys.stdout.flush()
-startTime=time.time()
-preAttackKNN=bd.knnContextVector(attackCVDict,preAttackFiles,contextList,attackWordList,1000,5)
-endTime=time.time()
-print('finished knn preAttack')
-print((endTime-startTime)/3600)
-sys.stdout.flush()
-pd.DataFrame(preAttackKNN).to_csv('./preAttack_knn.csv', index=False, header=False)
-
-#Get knn for context vectors in pre attack files
-print('starting get knn postAttack')
-sys.stdout.flush()
-startTime=time.time()
-postAttackKNN=bd.knnContextVector(attackCVDict,postAttackFiles,contextList,attackWordList,1000,5)
-endTime=time.time()
-print('finished knn postAttack')
-print((endTime-startTime)/3600)
-sys.stdout.flush()
-pd.DataFrame(postAttackKNN).to_csv('./postAttack_knn.csv', index=False, header=False)
